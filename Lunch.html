@@ -1,0 +1,344 @@
+<template>
+  <div class="container">
+    <h1>
+      It's lunch time
+      <span v-if="selectedRestaurant">at {{ selectedRestaurant.name }}!</span>
+    </h1>
+
+    <p>
+      Making decisions is hard, like really hard. So, if the team can't decide
+      where to go to lunch then just let the lunch time slot machine do it. It's
+      time for lunch, where are we going?
+    </p>
+
+    <div class="slot-machine">
+      <ul class="slot-list" :class="{ running: isRunning }">
+        <li v-for="(r, index) in slots" :key="`${r.id}-${index}`">
+          <p class="slot-text">
+            {{ r.name }}
+          </p>
+        </li>
+      </ul>
+      <button v-if="!slots.length" class="slot-text starter" @click="runSlots">
+        What's for Lunch?
+      </button>
+    </div>
+
+    <button class="trigger" @click="runSlots" :disabled="isRunning">
+      {{ actionText }}
+    </button>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "Landing",
+  metaInfo: {
+    title: "It's Lunch Time!"
+  },
+  data() {
+    return {
+      isRunning: false,
+      selectedIndex: 0,
+      selectedRestaurant: null,
+      pastSelections: [],
+      slots: [],
+      actionText: "I'm Hungry",
+      restaurants: [
+        {
+          id: "1",
+          name: "Brickhouse Pizza"
+        },
+        {
+          id: "2",
+          name: "Addies Thai House"
+        },
+        {
+          id: "3",
+          name: "Las Palmas"
+        },
+        {
+          id: "4",
+          name: "Companion Bakery"
+        },
+        {
+          id: "4",
+          name: "Wok Express"
+        },
+        {
+          id: "5",
+          name: "Qdoba"
+        },
+        {
+          id: "6",
+          name: "Dave and Tony's"
+        },
+        {
+          id: "7",
+          name: "Hu Hot"
+        },
+        {
+          id: "8",
+          name: "Sybergs"
+        },
+        {
+          id: "9",
+          name: "Viviano's"
+        },
+        {
+          id: "10",
+          name: "Trainwreck"
+        },
+        {
+          id: "11",
+          name: "DD Mau"
+        },
+        {
+          id: "12",
+          name: "Gobble Stop"
+        },
+        {
+          id: "13",
+          name: "First Watch"
+        },
+        {
+          id: "14",
+          name: "Pei Wei"
+        },
+        {
+          id: "15",
+          name: "Balducci's"
+        },
+        {
+          id: "16",
+          name: "Mod Pizza"
+        },
+        {
+          id: "17",
+          name: "China One"
+        },
+        {
+          id: "18",
+          name: "Casa Juarez"
+        },
+        {
+          id: "19",
+          name: "Edge Wild"
+        },
+        {
+          id: "20",
+          name: "Rotisserie"
+        },
+        {
+          id: "21",
+          name: "O'Fallon Brewery"
+        },
+        {
+          id: "22",
+          name: "Bandana's BBQ"
+        },
+        {
+          id: "23",
+          name: "Snarf’s"
+        },
+        {
+          id: "24",
+          name: "Vivola Express"
+        },
+        {
+          id: "25",
+          name: "Sushi Ai"
+        },
+        {
+          id: "26",
+          name: "California Pizza Kitchen"
+        },
+        {
+          id: "27",
+          name: "Fuzzy's Tacos"
+        },
+        {
+          id: "28",
+          name: "Seoul Taco"
+        },
+        {
+          id: "29",
+          name: "Gioia's Deli"
+        },
+        {
+          id: "30",
+          name: "Waffle House"
+        },
+        {
+          id: "31",
+          name: "The Shack"
+        },
+        {
+          id: "32",
+          name: "McAlister's"
+        },
+        {
+          id: "33",
+          name: "El Maguey"
+        },
+        {
+          id: "34",
+          name: "Mr. Piggy’s Smokehouse"
+        },
+        {
+          id: "35",
+          name: "Chipotle"
+        }
+      ]
+    };
+  },
+  methods: {
+    runSlots() {
+      // clear the selected restaurant
+      this.selectedRestaurant = null;
+      // get the last item in past selections
+      const lastSelected = this.pastSelections[this.pastSelections.length - 1];
+      // filter out any items from the restaurant array that are in the past selections array
+      let slotsArray = this.restaurants.filter(
+        (it) => !this.pastSelections.find((past) => past.id === it.id)
+      );
+      // get a randowm index from the slots array
+      const selectedIndex = Math.floor(Math.random() * slotsArray.length);
+      // get a version of the slots array trimmed to the selected restaurant
+      const trimmedSlotsArray = slotsArray.slice(0, selectedIndex + 1);
+      // build out the scrolling list
+      let scrollSlotsArray = [...slotsArray, ...slotsArray];
+      // if there is a last selected item, add it to the beginning of the list so the animation doesn't jump
+      if (lastSelected) scrollSlotsArray = [lastSelected, ...scrollSlotsArray];
+      // set the slots array for the UI
+      this.slots = [...scrollSlotsArray, ...trimmedSlotsArray];
+      // run the animation
+      this.isRunning = true;
+      // after the animation is done, set the selected restaurant, push to past selections, reset the slots array, and stop the animation
+      setTimeout(() => {
+        this.selectedRestaurant = slotsArray[selectedIndex];
+        this.pastSelections.push(this.selectedRestaurant);
+        this.slots = [this.selectedRestaurant];
+        this.actionText = "Nah, Something Else";
+        this.isRunning = false;
+      }, 5000);
+    }
+  }
+};
+</script>
+
+<style>
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap");
+:root {
+  --primary: #5fb3b3;
+  --primary-lightest: #9be2e2;
+  --primary-light: #79c2c4;
+  --primary-dark: #1a8384;
+  --ink: #0f1c23;
+  --ink-light: #343d46;
+  --timing-l: 5s;
+  --timing-s: 0.5s;
+}
+body {
+  color: var(--ink-light);
+  font-family: "IBM Plex Sans", sans-serif;
+}
+h1 {
+  color: var(--ink);
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+.container {
+  box-sizing: content-box;
+  max-width: 75ch;
+  margin-left: auto;
+  margin-right: auto;
+  padding: max(1rem, 4vw);
+}
+.container > * + * {
+  margin-top: var(--spacer, 1.5em);
+}
+.container > p {
+  line-height: 1.6;
+}
+.slot-machine {
+  height: 8rem;
+  overflow: hidden;
+  border: 2px solid var(--primary);
+  position: relative;
+}
+.slot-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  transition: 0s;
+}
+.slot-text {
+  background: transparent;
+  border: none;
+  display: grid;
+  font-size: clamp(1.75rem, 2.25vw + 1rem, 4rem);
+  font-weight: 700;
+  height: 8rem;
+  margin: 0;
+  place-content: center;
+  padding: 0;
+  text-align: center;
+  width: 100%;
+}
+.running {
+  transform: translateY(calc(-100% + 8rem));
+  transition: var(--timing-l) cubic-bezier(0.19, 0.97, 0.5, 1.005);
+}
+.starter {
+  color: var(--primary-light);
+}
+.trigger {
+  background-color: var(--primary);
+  backface-visibility: hidden;
+  border: none;
+  color: white;
+  display: flex;
+  font-size: 1.25rem;
+  font-weight: 700;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 1rem;
+  perspective: 10000px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform var(--timing-s);
+  width: 15rem;
+}
+.trigger::before,
+.trigger::after {
+  background-color: var(--primary);
+  backface-visibility: hidden;
+  content: "";
+  display: block;
+  height: 1rem;
+  position: absolute;
+  top: 100%;
+  transform: rotateX(-90deg);
+  transform-origin: 50% 0%;
+  width: 100%;
+}
+.trigger::after {
+  background-color: var(--primary-dark);
+  transform: rotateX(-90deg) scaleX(0);
+  transition-delay: var(--timing-s);
+}
+.trigger:hover {
+  background-color: var(--primary-dark);
+}
+.trigger:disabled {
+  background-color: var(--primary-light);
+  transform: rotateX(90deg);
+}
+.trigger:disabled::after {
+  transform: rotateX(-90deg) scaleX(1);
+  transform-origin: 0 0;
+  transition: transform 4s linear var(--timing-s);
+}
+</style>
